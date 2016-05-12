@@ -34,17 +34,36 @@
 					// alert(data.summary);
 					doc_list = data.summary;
 					var $ul = $('#tab2 ul');
-						for(var i = 0; i < doc_list.length; i++){
+					var html = '<table class="table">'
+					var column_count = 5;
+					var counter = 0
+					if(doc_list.length < column_count){
+		                 column_count = doc_list.length
+		             }
+					for(var i = 0; i < doc_list.length; i++){
+						if(counter == 0){
+							html+='<tr>';
+						}
+						html+='<td style="border-top: none !important;"><a target="#" href="'+ doc_list[i].pdf_file+ '" class="thumbnail" ><img src="'
+	                            + doc_list[i].template_file+ '" alt=""></a></td>'
+	                     counter +=1;
+	                     
+	                     if(counter == column_count){
+	                     	html += '</tr>';
+	                     	counter = 0;
+	                     }
 
-	                    var doc_name = doc_list[i].pdf_file_name;
-	                    var element = '<li class="span4"><a target="#" href="'
-                            + doc_list[i].pdf_file
-                            + '" class="thumbnail" style="width: 10%;"><img src="'
-                            + doc_list[i].template_file
-                            + '" alt=""></a></li>';
-	                    var $element = $(element);
-	                    $ul.append($element);
+	                    // var doc_name = doc_list[i].pdf_file_name;
+	                    // var element = '<li class="span4"><a target="#" href="'
+                     //        + doc_list[i].pdf_file
+                     //        + '" class="thumbnail" style="width: 10%;"><img src="'
+                     //        + doc_list[i].template_file
+                     //        + '" alt=""></a></li>';
+	                    // var $element = $(element);
+	                    // $ul.append($element);
                		 }
+               		 html += '</table>'
+               		 $('#tab2').html(html)
 				},
 				error: function (xhr, textStatus, errorThrown) {
 	                    console.log(xhr.responseText);
@@ -78,6 +97,7 @@
 							alert(data.summary);
 							var $ul = $('#tab2 ul');
 							$ul.empty();
+							$('#tab2').html('')
 							get_view_loaded()
 
 		            },
