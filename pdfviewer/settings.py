@@ -123,3 +123,5 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
 STATICFILES_DIRS = (os.path.join('static'), )
 PDF_LOCATION = (os.path.join(BASE_DIR, "pdf_location"))
+MEDIA_ROOT = PDF_LOCATION
+MEDIA_URL = '/pdf_location/'
