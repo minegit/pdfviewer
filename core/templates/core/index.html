@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>PDF View</title>
+	{% load staticfiles %}
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="{% static "javascript/jquery.min.js" %}"></script>
+    <script src="{% static "javascript/bootstrap.min.js" %}"></script>
+    <script src="{% static "javascript/my.js" %}"></script>
+	<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+    <!-- <script type="text/javascript" src="mule-uploader.js"></script> -->
+    {% load staticfiles %}
+    <script type="text/javascript">
+    $(function() {
+		// alert(1);
+		// var supported = browserSupportCheck();
+	    //show gallery first
+	    $('a[href="#tab2"]').tab('show');
+	    $('#myTabContent').show();
+	    $('#form_submit').click(function() {
+	    	alert(1);
+	    	submit_form()
+	    });
+	});
+
+	
+	function csrfSafeMethod(method) {
+    	// these HTTP methods do not require CSRF protection
+    	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+	}
+
+
+	function submit_form(){
+		event.preventDefault();
+		var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
+		var formData = new FormData($('form.fileForm').get(0));
+		console.log(formData);
+		$.ajax({
+	    		type : "POST",
+	    		url : 'ajax_upload_pdf',
+	    		contentType: false,
+    			processData: false,
+	    		data : formData,
+	    		beforeSend: function(xhr, settings) {
+							$('#infoModal').modal('hide');
+					        $('#processingModal').modal('show');
+					        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+					            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+					        }
+					    },
+	            success: function (data) {
+						$('#processingModal').modal('hide');
+						$('#infoModal').modal('hide');
+						alert(data.summary);
+	            },
+	            error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                            $('#processingModal').modal('hide');
+	                        	$('#infoModal').modal('show');
+	                            alert("Status: " + textStatus);
+	                            alert("Error: " + errorThrown);
+	                        }
+	    	});
+		}
+    </script>
+</head>
+<body>
+<div class="container-fluid" style="padding: 0 0 0 20px">
+            <div class="row-fluid">
+                <div id="menuArea" class="span3">
+                    <!--Sidebar content-->
+                    <div class="page-header">
+                        <h2>WebViewer Showcase</h2>
+                        <div>PDF WebViewer</div>
+                    </div>
+                    <ul class="nav nav-tabs">
+                        <li>
+                            <a href="#tab1" data-toggle="tab">Your Files</a>
+                        </li>
+                        <li><a href="#tab2" data-toggle="tab">Gallery</a></li>
+                        <li><a href="#tab3" data-toggle="tab">Options</a></li>
+
+                        <!--                            <li><a href="#">My uploaded</a></li>-->
+                    </ul>
+
+                    <div id="myTabContent" class="tab-content">
+<!--                        <span style="float:left; display: block; background: fuchsia">UP</span>-->
+                        <div class="tab-pane fade active in" id="tab0"></div>
+                        <div class="tab-pane fade" id="tab1">
+                            <div class="well well-small">
+                                <h4>Create your own</h4>
+                                <p style="align-content: center;padding-left: 43%;">
+                                    Try out PDFTron WebViewer using your own documents.
+                                </p>
+                                <div id="browserSupportAlert" class="alert" style="margin-top:5px; margin-bottom: 0;display:none">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    Your browser does not support this feature to create your own document.
+                                    You can still view WebViewer documents from the pre-generated gallery.
+                                </div>
+                                <div id="uploadControls" style="text-align: center;">
+                                <form class="fileForm" id >
+                					{% csrf_token %}
+                					<div class="form-group">
+									    <label for="imageInputFile">File input</label>
+									    <input type="file" id="file" name="file"/>
+									    <p class="help-block"></p>
+								  </div>
+                					<button type="submit" class="btn btn-default btn-primary" id="form_submit">Submit Your File</button>
+                				</form>
+                                    
+                                    <!-- <div id="uploadButton" class="btn btn-large btn-primary" >
+                                        <div >Upload Your File</div>
+                                    </div> -->
+                                    <div class="fileButtonText">
+                                        Your file will be optimized on our server and allows many file types to be viewed like .pdf, .docx, images and more!
+                                    </div>
+                                    <input type="file" accept="application/pdf" id="pdfFile" />
+                                    <div id="localPDFButton" class="btn btn-large btn-primary" >
+                                        <div>Open PDF</div>
+                                    </div>
+                                    <div class="fileButtonText">
+                                        Your PDF is opened directly in the browser and isn't touched on the server side at all!
+                                    </div>
+                                    <div style="margin-top:10px;" class="progress progress-striped active">
+                                        <div class="bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="well well-small">
+                                <h4>Thumbnail Preview</h4>
+                                <div id="thumbnailContainer" style="text-align: center;" >
+									<div style="width:100px;height:150px;background:#eee;margin:0 auto" class="img-polaroid">
+										<span style="color:white; font-weight:bold;margin-top:60px;display: block;font-variant: small-caps;font-size: large;">preview</span>
+									</div>
+                                </div>
+                            </div>
+                            <div class="well well-small">
+                                <h4>Log Viewer</h4>
+                                <textarea id="log" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab2">
+                            <ul class="thumbnails">
+                                  <!--content is generated on runtime -->
+                            </ul>
+                        </div>
+                        <div class="tab-pane fade" id="tab3">
+                            <div class="well well-small">
+                                <!--                                <label for="viewerTypeSelect">Viewer Type:</label>-->
+                                <h4>Viewer Type</h4>
+                                <div style="text-align:center">
+                                    <select id="viewerTypeSelect" name="viewerTypeSelect" style="width: auto">
+                                        <option value="html5,silverlight,flash">Auto-detect</option>
+                                        <option class="noMobile" value="html5">HTML5</option>
+                                        <option value="html5Mobile">HTML5Mobile</option>
+<!--                                         <option class="noMobile" value="silverlight">Silverlight</option>
+                                        <option class="noMobile" value="flash">Flash</option> -->
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div id="contentArea" class="span9">
+                   
+                    <div id="viewerArea" class="" style="border-left: 2px solid grey; padding:0; margin:0; background:white">
+                        <!-- <iframe frameborder="0" name="webViewerContainer" id="webViewerContainer" class="documentContainer"
+                                src="../demo/viewer.html?d=../../xod/NY_fun_list.xod&did=0&v=html5,silverlight,flash"
+                                allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+                        </iframe>
+                        <iframe frameborder="0" name="pdfContainer" id="pdfContainer" class="documentContainer hidden"
+                                src="../demo/viewer.html?did=pdf&a=true&docType=pdf"
+                                allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">
+                        </iframe> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+</body>
+</html>
