@@ -11,10 +11,13 @@
     <!-- <script type="text/javascript" src="mule-uploader.js"></script> -->
     {% load staticfiles %}
     <script type="text/javascript">
+       $('#processingModal').modal('show');
 	    $(function() {
+	    	$('#processingModal').modal('hide');
 		    $('a[href="#tab2"]').tab('show');
 		    get_view_loaded();
 		    $('#myTabContent').show();
+
 		    $('#form_submit').click(function() {
 		    	submit_form();
 		    });
@@ -29,6 +32,7 @@
 						        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
 						            xhr.setRequestHeader("X-CSRFToken", csrftoken);
 						        }
+						        $('#processingModal').modal('show');
 						    },
 				success:function(data){
 					// alert(data.summary);
@@ -63,10 +67,12 @@
 	                    // $ul.append($element);
                		 }
                		 html += '</table>'
-               		 $('#tab2').html(html)
+               		 $('#tab2').html(html);
+					 $('#processingModal').modal('hide');
 				},
 				error: function (xhr, textStatus, errorThrown) {
 	                    console.log(xhr.responseText);
+	                    $('#processingModal').modal('hide');
 	                }
 
 			});
@@ -89,19 +95,22 @@
 	    			processData: false,
 		    		data : formData,
 		    		beforeSend: function(xhr, settings) {
+		    					$('#processingModal').modal('show');
 						        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
 						            xhr.setRequestHeader("X-CSRFToken", csrftoken);
 						        }
 						    },
 		            success: function (data) {
+							$('#processingModal').modal('hide');
 							alert(data.summary);
 							var $ul = $('#tab2 ul');
 							$ul.empty();
 							$('#tab2').html('')
-							get_view_loaded()
+							get_view_loaded();
 
 		            },
 		            error: function (XMLHttpRequest, textStatus, errorThrown) {
+		            	$('#processingModal').modal('hide');
 		                            alert("Status: " + textStatus);
 		                            alert("Error: " + errorThrown);
 		                        }
@@ -110,7 +119,9 @@
     </script>
 </head>
 <body>
+
 	<div class="container-fluid" style="padding: 0 0 0 20px">
+
         <div class="row-fluid">
             <div id="menuArea" class="span3">
                 <!--Sidebar content-->
@@ -158,6 +169,12 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="processingModal"  tabindex="-1" role="dialog" aria-labelledby="processingModalLabel"
+         style="opacity: 1">
+        <div class="modal-body" id="processingModalBody" style="opacity: 1;vertical-align: middle;">
+        <img style="margin-left: 50%;margin-top: 14%;width: 10%;" src="{% static "images/loadinfo.net.gif" %}"/>
+        </div
+    </div>
 	</div>
 </body>
 </html>
